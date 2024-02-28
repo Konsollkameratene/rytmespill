@@ -61,20 +61,27 @@ def blitRotate(surf, image, pos, originPos, angle):#Credit to Rabbid76
     surf.blit(rotated_image, rotated_image_rect)
   
     # draw rectangle around the image
-    #pygame.draw.rect(surf, (255, 0, 0), (*rotated_image_rect.topleft, *rotated_image.get_size()),2)
+    pygame.draw.rect(surf, (255, 0, 0), (*rotated_image_rect.topleft, *rotated_image.get_size()),2)
 
-def AngleOfTwoVectors(vector1,vector2):#gpt
+def AngleOfTwoVectors(point1,point2):#gpt
+    vector1 = [point2[0] - point1[0], point2[1] - point1[1]]
+    vector2 = [1, 0]  # Reference vector along x-axis
+
     dot_product = vector1[0] * vector2[0] + vector1[1] * vector2[1]
+    cross_product = vector1[0] * vector2[1] - vector1[1] * vector2[0]
     magnitude1 = math.sqrt(vector1[0]**2 + vector1[1]**2)
     magnitude2 = math.sqrt(vector2[0]**2 + vector2[1]**2)
-    
+
     if magnitude1 == 0 or magnitude2 == 0:
-        return 0
+        return 0  # Return 0 angle when one of the vectors is a zero vector
     
-    cosine_angle = dot_product / (magnitude1 * magnitude2)
-    cosine_angle = min(1, max(-1, cosine_angle))  # Ensure cosine value is within [-1, 1]
-    angle_radians = math.acos(cosine_angle)
-    angle_degrees = math.degrees(angle_radians)
+    signed_angle_radians = math.atan2(cross_product, dot_product)
+    angle_degrees = math.degrees(signed_angle_radians)
+    
+    # Ensure the angle is positive
+    if angle_degrees < 0:
+        angle_degrees += 360
+    
     return angle_degrees
 
 # Sample rhythm pattern files
@@ -97,15 +104,13 @@ angle = 0
 while True:
     keys = pygame.key.get_pressed() # Henter trykkede knapper
     x, y, knappJ, knappA, knappB = min_kontroller.hent(keys)
-    print(x,y,knappA,knappB)
-
+    mousex, mousey = pygame.mouse.get_pos()
     screen.fill((255, 255, 255))
     screen.blit(Wheel,(width/2-200,height/2-200))
 
     #Shield
-    blitRotate(screen, shield_img, (width/2,height/2),(w/2,h/2),AngleOfTwoVectors([0,0],[x*10,y*10]))
-
-    pygame.display.flip()
+    print([width/2,height/2],[mousex,mousey])
+    blitRotate(screen, shield_img, (width/2,height/2),(w/2,h/2),AngleOfTwoVectors([width/2,height/2],[mousex,mousey]))
 
     for event in pygame.event.get():
         if event.type == QUIT:
@@ -113,11 +118,6 @@ while True:
             sys.exit()
         elif event.type == KEYDOWN:
             pass
-
-    if keys[K_LEFT]:
-        angle += 1
-    if keys[K_RIGHT]:
-        angle -= 1
 
     # Check if player input matches rhythm pattern
 
