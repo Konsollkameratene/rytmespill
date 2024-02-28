@@ -3,15 +3,13 @@ import sys
 import pygame
 import math
 from pygame.locals import *
-
+#denne filen bør sorteres med delfiler snart.
 pygame.init()
 
 fps = 60
 fpsClock = pygame.time.Clock()
 
-
 min_kontroller = kontroller_input.TestKontroller()#må byttes ut med ekte kontroller etter hvert.
-
 
 width, height = 1024, 768
 screen = pygame.display.set_mode((width, height))
