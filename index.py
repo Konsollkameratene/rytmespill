@@ -25,11 +25,6 @@ class Block():
       self.dir = dir
       print("New block",speed,dir)
 
-def rot_center(image, angle, x, y):
-    rotated_image = pygame.transform.rotate(image, angle)
-    new_rect = rotated_image.get_rect(center = image.get_rect(center = (x, y)).center)
-
-    return rotated_image, new_rect
 # Function to create falling blocks
 def create_block(action):#Bokstaver reflekterer en direksjon på greia
     action = action.split(':')
@@ -46,6 +41,41 @@ def handle_button_press():
 def check_input(rhythm_pattern):
     # Placeholder for now, you would implement this
     pass
+def blitRotate(surf, image, pos, originPos, angle):#Credit to Rabbid76
+
+    # offset from pivot to center
+    image_rect = image.get_rect(topleft = (pos[0] - originPos[0], pos[1]-originPos[1]))
+    offset_center_to_pivot = pygame.math.Vector2(pos) - image_rect.center
+    
+    # roatated offset from pivot to center
+    rotated_offset = offset_center_to_pivot.rotate(-angle)
+
+    # roatetd image center
+    rotated_image_center = (pos[0] - rotated_offset.x, pos[1] - rotated_offset.y)
+
+    # get a rotated image
+    rotated_image = pygame.transform.rotate(image, angle)
+    rotated_image_rect = rotated_image.get_rect(center = rotated_image_center)
+
+    # rotate and blit the image
+    surf.blit(rotated_image, rotated_image_rect)
+  
+    # draw rectangle around the image
+    #pygame.draw.rect(surf, (255, 0, 0), (*rotated_image_rect.topleft, *rotated_image.get_size()),2)
+
+def AngleOfTwoVectors(vector1,vector2):#gpt
+    dot_product = vector1[0] * vector2[0] + vector1[1] * vector2[1]
+    magnitude1 = math.sqrt(vector1[0]**2 + vector1[1]**2)
+    magnitude2 = math.sqrt(vector2[0]**2 + vector2[1]**2)
+    
+    if magnitude1 == 0 or magnitude2 == 0:
+        return 0
+    
+    cosine_angle = dot_product / (magnitude1 * magnitude2)
+    cosine_angle = min(1, max(-1, cosine_angle))  # Ensure cosine value is within [-1, 1]
+    angle_radians = math.acos(cosine_angle)
+    angle_degrees = math.degrees(angle_radians)
+    return angle_degrees
 
 # Sample rhythm pattern files
 rhythm_pattern_files = ["patterns/beatmaster.pat"]
@@ -57,8 +87,13 @@ print(rhythm_pattern)
 
 #midlertidig
 Wheel = pygame.transform.scale(pygame.image.load("assets/wheel.png"), (400,400))
-Shield = pygame.transform.scale(pygame.image.load("assets/shield.png"), (400,400))
+shield_img = pygame.transform.scale(pygame.image.load("assets/shield.png"), (400,400))
+w, h = shield_img.get_size()
+Shield = pygame.transform.scale(shield_img, (400,400))
 # Game loop
+
+#midlertidlig variabel
+angle = 0
 while True:
     keys = pygame.key.get_pressed() # Henter trykkede knapper
     x, y, knappJ, knappA, knappB = min_kontroller.hent(keys)
@@ -66,15 +101,23 @@ while True:
 
     screen.fill((255, 255, 255))
     screen.blit(Wheel,(width/2-200,height/2-200))
-    #Rect
-    screen.blit(Shield,(0,0))
+
+    #Shield
+    blitRotate(screen, shield_img, (width/2,height/2),(w/2,h/2),AngleOfTwoVectors([0,0],[x*10,y*10]))
+
+    pygame.display.flip()
 
     for event in pygame.event.get():
         if event.type == QUIT:
             pygame.quit()
             sys.exit()
         elif event.type == KEYDOWN:
-            handle_button_press()
+            pass
+
+    if keys[K_LEFT]:
+        angle += 1
+    if keys[K_RIGHT]:
+        angle -= 1
 
     # Check if player input matches rhythm pattern
 
