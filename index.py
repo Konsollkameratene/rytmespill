@@ -9,7 +9,7 @@ pygame.init()
 fps = 60
 fpsClock = pygame.time.Clock()
 
-min_kontroller = kontroller_input.TestKontroller()#må byttes ut med ekte kontroller etter hvert.
+min_kontroller = kontroller_input.PygameKontroller()#må byttes ut med ekte kontroller etter hvert.
 
 width, height = 1024, 768
 screen = pygame.display.set_mode((width, height))
@@ -93,24 +93,28 @@ rhythm_pattern = read_rhythm_pattern(rhythm_pattern_files[index])
 print(rhythm_pattern)
 
 #midlertidig
-Wheel = pygame.transform.scale(pygame.image.load("assets/wheel.png"), (400,400))
-shield_img = pygame.transform.scale(pygame.image.load("assets/shield.png"), (400,400))
+Wheel = pygame.transform.scale(pygame.image.load("assets/wheel.png"), (200,200))
+shield_img = pygame.transform.scale(pygame.image.load("assets/shield.png"), (200,200))
 w, h = shield_img.get_size()
-Shield = pygame.transform.scale(shield_img, (400,400))
+Shield = pygame.transform.scale(shield_img, (200,200))
 # Game loop
 
 #midlertidlig variabel
 angle = 0
+usex = 0
+usey = 0
 while True:
     keys = pygame.key.get_pressed() # Henter trykkede knapper
     x, y, knappJ, knappA, knappB = min_kontroller.hent(keys)
     mousex, mousey = pygame.mouse.get_pos()
     screen.fill((255, 255, 255))
-    screen.blit(Wheel,(width/2-200,height/2-200))
+    screen.blit(Wheel,(width/2-100,height/2-100))
 
     #Shield
-    print([width/2,height/2],[mousex,mousey])
-    blitRotate(screen, shield_img, (width/2,height/2),(w/2,h/2),AngleOfTwoVectors([width/2,height/2],[mousex,mousey]))
+    print(x, y)
+    if abs(x) > 0.1 or abs(y) > 0.1:
+        usex, usey = x, y
+    blitRotate(screen, shield_img, (width/2,height/2),(w/2,h/2),AngleOfTwoVectors([width/2,height/2],[usex+width/2,usey+height/2]))
 
     for event in pygame.event.get():
         if event.type == QUIT:
