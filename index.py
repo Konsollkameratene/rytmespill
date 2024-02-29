@@ -84,11 +84,28 @@ def AngleOfTwoVectors(point1,point2):#gpt
     
     return angle_degrees
 
+class Player():
+    def __init__(self,x ,y) -> None:
+        self.x, self.y = x, y
+        self.tox, self.toy = x, y
+        self.score = 100#perfect score at start
+        pass
+    def blitComponents(self):
+        screen.blit(Wheel,(self.x-100,self.y-100))
+        blitRotate(screen, shield_img, (self.x,self.y),(w/2,h/2),AngleOfTwoVectors([self.x,self.y],[self.x+self.tox,self.y+self.toy]))
+        pass
+    def Input(self, inx, iny):
+        if abs(inx) > 0.1 or abs(iny) > 0.1:
+            self.tox, self.toy = inx, iny
+
+
+    
+
 # Sample rhythm pattern files
 rhythm_pattern_files = ["patterns/beatmaster.pat"]
 index = 0
 tickdown = 0
-
+players = [Player(200, 400), Player(800, 400)]
 rhythm_pattern = read_rhythm_pattern(rhythm_pattern_files[index])
 print(rhythm_pattern)
 
@@ -108,14 +125,15 @@ while True:
     x, y, knappJ, knappA, knappB = min_kontroller.hent(keys)
     mousex, mousey = pygame.mouse.get_pos()
     screen.fill((255, 255, 255))
-    screen.blit(Wheel,(width/2-100,height/2-100))
-
+    screen.blit(Wheel,(mousex-100,mousey-100))
     #Shield
     print(x, y)
-    if abs(x) > 0.1 or abs(y) > 0.1:
-        usex, usey = x, y
-    blitRotate(screen, shield_img, (width/2,height/2),(w/2,h/2),AngleOfTwoVectors([width/2,height/2],[usex+width/2,usey+height/2]))
-
+    
+    for player in players:#gjør det slik at hver player blir tildelt en kontroller de bruker i sin deklarasjon
+        player.Input(mousex - player.x, mousey - player.y)
+        player.blitComponents()
+        
+    #roterer skjoldet.
     for event in pygame.event.get():
         if event.type == QUIT:
             pygame.quit()
