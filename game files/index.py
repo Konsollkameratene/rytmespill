@@ -57,6 +57,20 @@ def calculate_coordinate(origin, angle, distance):
 
     return (new_x, new_y)
 
+
+normalize_angle = lambda angle: angle % 360
+
+def within_range(angle1, angle2, leeway):
+    # Calculate the absolute difference between the angles
+    diff = abs(angle1 - angle2)
+    
+    # Adjust the difference to account for the circular nature of angles
+    if diff > 180:
+        diff = 360 - diff
+
+    # Check if the absolute difference is less than or equal to the leeway
+    return diff <= leeway
+
 def AngleOfTwoVectors(point1,point2):#inputs arent techincally vectors but ok.
     vector1 = [point2[0] - point1[0], point2[1] - point1[1]]
     vector2 = [1, 0]  # Reference vector along x-axis
@@ -104,18 +118,19 @@ class Block():
       print("New block:",speed,self.dir)
     def Draw(self):
         drawposx, drawposy = calculate_coordinate([players[self.target].x, players[self.target].y], self.dir, self.distance)
-        screen.blit(Wheel,(drawposx-100,drawposy-100))
+        screen.blit(enemy,(drawposx-20,drawposy-20))
 
 # Sample rhythm pattern files
 rhythm_pattern_files = ["game files/patterns/beatmaster.pat"]
 index = 0
 tickdown = 0
-players = [Player(200, 400), Player(800, 400)]
+players = [Player(400, 400), Player(1200, 400)]
 rhythm_pattern = read_rhythm_pattern(rhythm_pattern_files[index])
 print(rhythm_pattern)
 
 #midlertidig
 Wheel = pygame.transform.scale(pygame.image.load("game files/assets/wheel.png"), (200,200))
+enemy = pygame.transform.scale(pygame.image.load("game files/assets/enemy.png"), (40,40))
 shield_img = pygame.transform.scale(pygame.image.load("game files/assets/shield.png"), (200,200))
 w_shield, h_shield = shield_img.get_size()
 Shield = pygame.transform.scale(shield_img, (200,200))
@@ -133,6 +148,9 @@ while True:
     mousex, mousey = pygame.mouse.get_pos()
 
     screen.fill((255, 255, 255))
+
+    fakex, fakey = calculate_coordinate([players[0].x, players[0].y], (360 - players[0].angle) % 360, 200)
+    screen.blit(enemy,(fakex-20,fakey-20))#testtoseeblockdir
   
     for id, player in enumerate(players):#gjør det slik at hver player blir tildelt en kontroller de bruker i sin deklarasjon
         if id == 0:
@@ -143,19 +161,21 @@ while True:
     
     if (len(blocks)>0):
         for i, block in enumerate(blocks):
+            #print(within_range(players[block.target].angle, block.dir, 50), block.dir)
             #check if blocked
             if block.distance < 150 and block.distance > 80:
-                if(players[block.target].angle < block.dir + 20 or players[block.target].angle > block.dir - 20):
+                if(within_range((360 - players[block.target].angle) % 360, block.dir, 50)):
+                    print("blocked!")
                     blocks.pop(i)
                     break
             elif block.distance <= 10:
+                print("dead")
                 players[block.target].score -= 5
                 blocks.pop(i)
                 break
             
             block.distance -= block.speed
             block.Draw()
-            print(block.distance)
 
     player.blitComponents()#draweverything
         
