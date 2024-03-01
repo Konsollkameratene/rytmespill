@@ -5,7 +5,6 @@ import math
 from pygame.locals import *
 #denne filen bør sorteres med delfiler snart.
 pygame.init()
-
 fps = 60
 fpsClock = pygame.time.Clock()
 
@@ -102,7 +101,7 @@ class Player():
     
 
 # Sample rhythm pattern files
-rhythm_pattern_files = ["patterns/beatmaster.pat"]
+rhythm_pattern_files = ["game files/patterns/beatmaster.pat"]
 index = 0
 tickdown = 0
 players = [Player(200, 400), Player(800, 400)]
@@ -110,8 +109,8 @@ rhythm_pattern = read_rhythm_pattern(rhythm_pattern_files[index])
 print(rhythm_pattern)
 
 #midlertidig
-Wheel = pygame.transform.scale(pygame.image.load("assets/wheel.png"), (200,200))
-shield_img = pygame.transform.scale(pygame.image.load("assets/shield.png"), (200,200))
+Wheel = pygame.transform.scale(pygame.image.load("game files/assets/wheel.png"), (200,200))
+shield_img = pygame.transform.scale(pygame.image.load("game files/assets/shield.png"), (200,200))
 w, h = shield_img.get_size()
 Shield = pygame.transform.scale(shield_img, (200,200))
 # Game loop
@@ -129,8 +128,11 @@ while True:
     #Shield
     print(x, y)
     
-    for player in players:#gjør det slik at hver player blir tildelt en kontroller de bruker i sin deklarasjon
-        player.Input(mousex - player.x, mousey - player.y)
+    for id, player in enumerate(players):#gjør det slik at hver player blir tildelt en kontroller de bruker i sin deklarasjon
+        if id == 0:
+            player.Input(mousex - player.x, mousey - player.y)
+        elif id == 1:
+            player.Input(x, y)
         player.blitComponents()
         
     #roterer skjoldet.
