@@ -97,9 +97,6 @@ class Player():
         if abs(inx) > 0.1 or abs(iny) > 0.1:
             self.tox, self.toy = inx, iny
 
-
-    
-
 # Sample rhythm pattern files
 rhythm_pattern_files = ["game files/patterns/beatmaster.pat"]
 index = 0
@@ -120,22 +117,24 @@ angle = 0
 usex = 0
 usey = 0
 while True:
+    #test-input
     keys = pygame.key.get_pressed() # Henter trykkede knapper
     x, y, knappJ, knappA, knappB = min_kontroller.hent(keys)
     mousex, mousey = pygame.mouse.get_pos()
+
     screen.fill((255, 255, 255))
+
+    #mouse cursor
     screen.blit(Wheel,(mousex-100,mousey-100))
-    #Shield
-    print(x, y)
     
     for id, player in enumerate(players):#gjør det slik at hver player blir tildelt en kontroller de bruker i sin deklarasjon
         if id == 0:
             player.Input(mousex - player.x, mousey - player.y)
-        elif id == 1:
+        elif id == 1:#midlertidig
             player.Input(x, y)
-        player.blitComponents()
+
+        player.blitComponents()#draweverything
         
-    #roterer skjoldet.
     for event in pygame.event.get():
         if event.type == QUIT:
             pygame.quit()
@@ -156,7 +155,6 @@ while True:
       index = index + 1
       tickdown = int(currentLine[1])'''
 
-    tickdown = tickdown - 1
-    # Update screen
+    tickdown = tickdown - 1#ticks for rythmpattern-reading, make it so it stays consistent with deltatime
     pygame.display.flip()
     fpsClock.tick(fps)
