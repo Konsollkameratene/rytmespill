@@ -20,9 +20,9 @@ def read_rhythm_pattern(filename):
         return file.read().splitlines()
     
 # Function to create falling blocks
-def create_block(action):#Bokstaver reflekterer en direksjon på greia
+def create_block(action):#direksjonen er fra 1-360
     action = action.split(':')
-    blocks.append(Block(action[1], action[0], 0))
+    blocks.append(Block(int(action[1]), int(action[0]), 0))
 
 
 def blitRotate(surf, image, pos, originPos, angle):#Credit to Rabbid76
@@ -46,6 +46,16 @@ def blitRotate(surf, image, pos, originPos, angle):#Credit to Rabbid76
   
     # draw rectangle around the image
     pygame.draw.rect(surf, (255, 0, 0), (*rotated_image_rect.topleft, *rotated_image.get_size()),2)
+
+def calculate_coordinate(origin, angle, distance):
+    # Convert angle from degrees to radians
+    angle_radians = math.radians(angle)
+
+    # Calculate the new coordinates
+    new_x = origin[0] + distance * math.cos(angle_radians)
+    new_y = origin[1] + distance * math.sin(angle_radians)
+
+    return (new_x, new_y)
 
 def AngleOfTwoVectors(point1,point2):#inputs arent techincally vectors but ok.
     vector1 = [point2[0] - point1[0], point2[1] - point1[1]]
@@ -72,22 +82,29 @@ class Player():
     def __init__(self,x ,y ) -> None:
         self.x, self.y = x, y
         self.tox, self.toy = x, y
+        self.angle = 0
         self.score = 100#perfect score at start, basically glorified HP
 
     def blitComponents(self):
         screen.blit(Wheel,(self.x-100,self.y-100))
-        blitRotate(screen, shield_img, (self.x,self.y),(w_shield/2,h_shield/2),AngleOfTwoVectors([self.x,self.y],[self.x+self.tox,self.y+self.toy]))
+        blitRotate(screen, shield_img, (self.x,self.y),(w_shield/2,h_shield/2),self.angle)
 
     def Input(self, inx, iny):
         if abs(inx) > 0.1 or abs(iny) > 0.1:#no sufficient input = no change in direction
             self.tox, self.toy = inx, iny
+        
+        self.angle = AngleOfTwoVectors([self.x,self.y],[self.x+self.tox,self.y+self.toy])
 
 class Block():
     def __init__(self, speed, angleOfAttack, attackWho):
       self.speed = speed
       self.dir = angleOfAttack
       self.target = attackWho
+      self.distance = 1000
       print("New block:",speed,self.dir)
+    def Draw(self):
+        drawposx, drawposy = calculate_coordinate([players[self.target].x, players[self.target].y], self.dir, self.distance)
+        screen.blit(Wheel,(drawposx-100,drawposy-100))
 
 # Sample rhythm pattern files
 rhythm_pattern_files = ["game files/patterns/beatmaster.pat"]
@@ -116,20 +133,31 @@ while True:
     mousex, mousey = pygame.mouse.get_pos()
 
     screen.fill((255, 255, 255))
-
-    #mouse cursor
-    screen.blit(Wheel,(mousex-100,mousey-100))
-    
+  
     for id, player in enumerate(players):#gjør det slik at hver player blir tildelt en kontroller de bruker i sin deklarasjon
         if id == 0:
             player.Input(mousex - player.x, mousey - player.y)
         elif id == 1:#midlertidig
             player.Input(x, y)
-    
-    for block in blocks:
-        pass
-
         player.blitComponents()#draweverything
+    
+    if (len(blocks)>0):
+        for i, block in enumerate(blocks):
+            #check if blocked
+            if block.distance < 150 and block.distance > 80:
+                if(players[block.target].angle < block.dir + 20 or players[block.target].angle > block.dir - 20):
+                    blocks.pop(i)
+                    break
+            elif block.distance <= 10:
+                players[block.target].score -= 5
+                blocks.pop(i)
+                break
+            
+            block.distance -= block.speed
+            block.Draw()
+            print(block.distance)
+
+    player.blitComponents()#draweverything
         
     for event in pygame.event.get():
         if event.type == QUIT:
