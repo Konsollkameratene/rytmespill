@@ -18,28 +18,13 @@ screen = pygame.display.set_mode((width, height))
 def read_rhythm_pattern(filename):
     with open(filename, 'r') as file:
         return file.read().splitlines()
-class Block():
-    def __init__(self, speed, dir):
-      self.speed = speed
-      self.dir = dir
-      print("New block",speed,dir)
-
+    
 # Function to create falling blocks
 def create_block(action):#Bokstaver reflekterer en direksjon på greia
     action = action.split(':')
-    Block(action[1], action[0])
+    blocks.append(Block(action[1], action[0], 0))
 
-    
 
-# Function to handle button presses
-def handle_button_press():
-    # Placeholder for now, you would implement this
-    pass
-
-# Function to check if player input matches rhythm pattern
-def check_input(rhythm_pattern):
-    # Placeholder for now, you would implement this
-    pass
 def blitRotate(surf, image, pos, originPos, angle):#Credit to Rabbid76
 
     # offset from pivot to center
@@ -97,6 +82,13 @@ class Player():
         if abs(inx) > 0.1 or abs(iny) > 0.1:#no sufficient input = no change in direction
             self.tox, self.toy = inx, iny
 
+class Block():
+    def __init__(self, speed, angleOfAttack, attackWho):
+      self.speed = speed
+      self.dir = angleOfAttack
+      self.target = attackWho
+      print("New block:",speed,self.dir)
+
 # Sample rhythm pattern files
 rhythm_pattern_files = ["game files/patterns/beatmaster.pat"]
 index = 0
@@ -116,6 +108,7 @@ Shield = pygame.transform.scale(shield_img, (200,200))
 angle = 0
 usex = 0
 usey = 0
+blocks = [] #no blocks yet
 while True:
     #test-input
     keys = pygame.key.get_pressed() # Henter trykkede knapper
@@ -132,6 +125,9 @@ while True:
             player.Input(mousex - player.x, mousey - player.y)
         elif id == 1:#midlertidig
             player.Input(x, y)
+    
+    for block in blocks:
+        pass
 
         player.blitComponents()#draweverything
         
@@ -145,7 +141,7 @@ while True:
     # Check if player input matches rhythm pattern
 
     #do action
-    '''if tickdown <= 0:
+    if tickdown <= 0:
       if index == len(rhythm_pattern):
         print("Last tick, song complete.")
         break
@@ -153,7 +149,7 @@ while True:
       currentLine = rhythm_pattern[index].split('-')
       create_block(currentLine[0])
       index = index + 1
-      tickdown = int(currentLine[1])'''
+      tickdown = int(currentLine[1])
 
     tickdown = tickdown - 1#ticks for rythmpattern-reading, make it so it stays consistent with deltatime
     pygame.display.flip()
