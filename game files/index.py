@@ -62,7 +62,7 @@ def blitRotate(surf, image, pos, originPos, angle):#Credit to Rabbid76
     # draw rectangle around the image
     pygame.draw.rect(surf, (255, 0, 0), (*rotated_image_rect.topleft, *rotated_image.get_size()),2)
 
-def AngleOfTwoVectors(point1,point2):#gpt
+def AngleOfTwoVectors(point1,point2):#inputs arent techincally vectors but ok.
     vector1 = [point2[0] - point1[0], point2[1] - point1[1]]
     vector2 = [1, 0]  # Reference vector along x-axis
 
@@ -84,17 +84,17 @@ def AngleOfTwoVectors(point1,point2):#gpt
     return angle_degrees
 
 class Player():
-    def __init__(self,x ,y) -> None:
+    def __init__(self,x ,y ) -> None:
         self.x, self.y = x, y
         self.tox, self.toy = x, y
-        self.score = 100#perfect score at start
-        pass
+        self.score = 100#perfect score at start, basically glorified HP
+
     def blitComponents(self):
         screen.blit(Wheel,(self.x-100,self.y-100))
-        blitRotate(screen, shield_img, (self.x,self.y),(w/2,h/2),AngleOfTwoVectors([self.x,self.y],[self.x+self.tox,self.y+self.toy]))
-        pass
+        blitRotate(screen, shield_img, (self.x,self.y),(w_shield/2,h_shield/2),AngleOfTwoVectors([self.x,self.y],[self.x+self.tox,self.y+self.toy]))
+
     def Input(self, inx, iny):
-        if abs(inx) > 0.1 or abs(iny) > 0.1:
+        if abs(inx) > 0.1 or abs(iny) > 0.1:#no sufficient input = no change in direction
             self.tox, self.toy = inx, iny
 
 # Sample rhythm pattern files
@@ -108,7 +108,7 @@ print(rhythm_pattern)
 #midlertidig
 Wheel = pygame.transform.scale(pygame.image.load("game files/assets/wheel.png"), (200,200))
 shield_img = pygame.transform.scale(pygame.image.load("game files/assets/shield.png"), (200,200))
-w, h = shield_img.get_size()
+w_shield, h_shield = shield_img.get_size()
 Shield = pygame.transform.scale(shield_img, (200,200))
 # Game loop
 
