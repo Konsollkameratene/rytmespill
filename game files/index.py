@@ -171,7 +171,7 @@ while True:
             elif block.distance <= 10:
                 print("dead")
                 players[block.target].score -= 5
-                blocks.pop(i)
+                blocks.pop(i)#popping this item might be causing lag spike
                 break
             
             block.distance -= block.speed
