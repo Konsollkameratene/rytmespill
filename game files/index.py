@@ -141,6 +141,11 @@ angle = 0
 usex = 0
 usey = 0
 blocks = [] #no blocks yet
+
+#Midlertidlig
+font = pygame.font.SysFont('Comic Sans MS', 30)
+text_surface = font.render('Some Text', False, (0, 0, 0))
+
 while True:
     #test-input
     keys = pygame.key.get_pressed() # Henter trykkede knapper
@@ -154,6 +159,8 @@ while True:
   
     for id, player in enumerate(players):#gjør det slik at hver player blir tildelt en kontroller de bruker i sin deklarasjon
         if id == 0:
+            text_surface = font.render(str(player.score), False, (255, 255, 255))
+            screen.blit(text_surface, (player.x, player.y-100))
             player.Input(mousex - player.x, mousey - player.y)
         elif id == 1:#midlertidig
             player.Input(x, y)
