@@ -112,13 +112,15 @@ class Player():
 class Block():
     def __init__(self, speed, angleOfAttack, attackWho):
       self.speed = speed
+      self.dead = False
       self.dir = angleOfAttack
       self.target = attackWho
       self.distance = 1000
       print("New block:",speed,self.dir)
     def Draw(self):
-        drawposx, drawposy = calculate_coordinate([players[self.target].x, players[self.target].y], self.dir, self.distance)
-        screen.blit(enemy,(drawposx-20,drawposy-20))
+        if not self.dead:
+            drawposx, drawposy = calculate_coordinate([players[self.target].x, players[self.target].y], self.dir, self.distance)
+            screen.blit(enemy,(drawposx-20,drawposy-20))
 
 # Sample rhythm pattern files
 rhythm_pattern_files = ["game files/patterns/beatmaster.pat"]
@@ -141,26 +143,23 @@ angle = 0
 usex = 0
 usey = 0
 blocks = [] #no blocks yet
-
+destroyedblocks = []
 #Midlertidlig
 font = pygame.font.SysFont('Comic Sans MS', 30)
-text_surface = font.render('Some Text', False, (0, 0, 0))
-
 while True:
+    screen.fill((255, 255, 255))
     #test-input
     keys = pygame.key.get_pressed() # Henter trykkede knapper
     x, y, knappJ, knappA, knappB = min_kontroller.hent(keys)
     mousex, mousey = pygame.mouse.get_pos()
-
-    screen.fill((255, 255, 255))
 
     fakex, fakey = calculate_coordinate([players[0].x, players[0].y], (360 - players[0].angle) % 360, 200)
     screen.blit(enemy,(fakex-20,fakey-20))#testtoseeblockdir
   
     for id, player in enumerate(players):#gjør det slik at hver player blir tildelt en kontroller de bruker i sin deklarasjon
         if id == 0:
-            text_surface = font.render(str(player.score), False, (255, 255, 255))
-            screen.blit(text_surface, (player.x, player.y-100))
+            text_surface = font.render(str(player.score), False, (255, 0, 0))
+            screen.blit(text_surface, (player.x, player.y-300))
             player.Input(mousex - player.x, mousey - player.y)
         elif id == 1:#midlertidig
             player.Input(x, y)
@@ -168,32 +167,26 @@ while True:
     
     if (len(blocks)>0):
         for i, block in enumerate(blocks):
-            #print(within_range(players[block.target].angle, block.dir, 50), block.dir)
-            #check if blocked
-            if block.distance < 150 and block.distance > 80:
-                if(within_range((360 - players[block.target].angle) % 360, block.dir, 50)):
-                    print("blocked!")
-                    blocks.pop(i)
+            if not block.dead:
+                if block.distance < 150 and block.distance > 80:
+                    if(within_range((360 - players[block.target].angle) % 360, block.dir, 50)):
+                        print("blocked!")
+                        block.dead = True
+                        break
+                elif block.distance <= 10:
+                    print("dead")
+                    block.dead = True
+                    players[block.target].score -= 5
                     break
-            elif block.distance <= 10:
-                print("dead")
-                players[block.target].score -= 5
-                blocks.pop(i)#popping this item might be causing lag spike
-                break
             
-            block.distance -= block.speed
-            block.Draw()
+                block.distance -= block.speed
+                block.Draw()
 
     player.blitComponents()#draweverything
-        
+    
     for event in pygame.event.get():
-        if event.type == QUIT:
-            pygame.quit()
-            sys.exit()
-        elif event.type == KEYDOWN:
-            pass
-
-    # Check if player input matches rhythm pattern
+        if event.type == pygame.QUIT:
+            running = False
 
     #do action
     if tickdown <= 0:
