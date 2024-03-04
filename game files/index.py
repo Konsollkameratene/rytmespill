@@ -146,7 +146,8 @@ blocks = [] #no blocks yet
 destroyedblocks = []
 #Midlertidlig
 font = pygame.font.SysFont('Comic Sans MS', 30)
-while True:
+running = True
+while running:
     screen.fill((255, 255, 255))
     #test-input
     keys = pygame.key.get_pressed() # Henter trykkede knapper
@@ -172,13 +173,11 @@ while True:
                     if(within_range((360 - players[block.target].angle) % 360, block.dir, 50)):
                         print("blocked!")
                         block.dead = True
-                        break
                 elif block.distance <= 10:
                     print("dead")
                     block.dead = True
                     players[block.target].score -= 5
-                    break
-            
+                                
                 block.distance -= block.speed
                 block.Draw()
 
