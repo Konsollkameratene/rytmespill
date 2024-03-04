@@ -94,6 +94,8 @@ def AngleOfTwoVectors(point1,point2):#inputs arent techincally vectors but ok.
 
 class Player():
     def __init__(self,x ,y ) -> None:
+        self.combo = 0
+        self.maxcombo = 0
         self.x, self.y = x, y
         self.tox, self.toy = x, y
         self.angle = 0
@@ -102,7 +104,12 @@ class Player():
     def blitComponents(self):
         screen.blit(Wheel,(self.x-100,self.y-100))
         blitRotate(screen, shield_img, (self.x,self.y),(w_shield/2,h_shield/2),self.angle)
-
+    def addCombo(self, amount):
+        self.combo += amount
+        if self.combo > self.maxcombo:
+            self.maxcombo = self.combo
+    def resetCombo(self, to):
+        self.combo = to
     def Input(self, inx, iny):
         if abs(inx) > 0.1 or abs(iny) > 0.1:#no sufficient input = no change in direction
             self.tox, self.toy = inx, iny
@@ -159,7 +166,7 @@ while running:
   
     for id, player in enumerate(players):#gjør det slik at hver player blir tildelt en kontroller de bruker i sin deklarasjon
         if id == 0:
-            text_surface = font.render(str(player.score), False, (255, 0, 0))
+            text_surface = font.render(str(player.score)+ "% score, combo: " + str(player.combo), False, (255, 0, 0))
             screen.blit(text_surface, (player.x, player.y-300))
             player.Input(mousex - player.x, mousey - player.y)
         elif id == 1:#midlertidig
@@ -171,13 +178,15 @@ while running:
             if not block.dead:
                 if block.distance < 150 and block.distance > 80:
                     if(within_range((360 - players[block.target].angle) % 360, block.dir, 50)):
+                        players[block.target].addCombo(1)
                         print("blocked!")
                         block.dead = True
                 elif block.distance <= 10:
+                    players[block.target].resetCombo(0)
                     print("dead")
                     block.dead = True
                     players[block.target].score -= 5
-                                
+
                 block.distance -= block.speed
                 block.Draw()
 
