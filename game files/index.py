@@ -177,7 +177,7 @@ while running:
         for i, block in enumerate(blocks):
             if not block.dead:
                 if block.distance < 150 and block.distance > 80:
-                    if(within_range((360 - players[block.target].angle) % 360, block.dir, 50)):
+                    if(within_range((360 - players[block.target].angle) % 360, block.dir, 30)):
                         players[block.target].addCombo(1)
                         print("blocked!")
                         block.dead = True
