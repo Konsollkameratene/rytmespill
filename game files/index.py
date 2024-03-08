@@ -133,7 +133,7 @@ class Block():
 rhythm_pattern_files = ["game files/patterns/beatmaster.pat"]
 index = 0
 tickdown = 0
-players = [Player(400, 400), Player(1200, 400)]
+players = [Player(400, 400), Player(800, 400)]
 rhythm_pattern = read_rhythm_pattern(rhythm_pattern_files[index])
 print(rhythm_pattern)
 
