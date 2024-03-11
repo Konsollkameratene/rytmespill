@@ -22,7 +22,8 @@ def read_rhythm_pattern(filename):
 # Function to create falling blocks
 def create_block(action):#direksjonen er fra 1-360
     action = action.split(':')
-    blocks.append(Block(int(action[1]), int(action[0]), 0))
+    for i in range(len(players)):
+        blocks.append(Block(int(action[1]), int(action[0]), i))
 
 
 def blitRotate(surf, image, pos, originPos, angle):#Credit to Rabbid76
@@ -204,6 +205,7 @@ while running:
       print("new tick, index =",index,"; in:",rhythm_pattern[index])
       currentLine = rhythm_pattern[index].split('-')
       create_block(currentLine[0])
+
       index = index + 1
       tickdown = int(currentLine[1])
 
